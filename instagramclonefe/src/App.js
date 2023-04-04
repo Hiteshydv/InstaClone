@@ -22,10 +22,11 @@ const Routing =()=>{
     const user = JSON.parse(localStorage.getItem("user"))
     if(user){
       dispatch({type:"USER",payload:user})
-    // }else{
+    }else{
       // const location=useLocation();
-    //   if(!navigate.location.pathname.startsWith('/reset'))
-    //        navigate('/signin')
+      if(!window.location.pathname.startsWith('/reset'))
+           // navigate('/signin')
+          window.location.href = '/signin';
     }
   },[])
    return(

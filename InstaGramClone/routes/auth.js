@@ -7,14 +7,10 @@ const bcrypt=require('bcryptjs')
 const jwt=require('jsonwebtoken')
 const {JWT_SECRET}=require('../keys')
 const requireLogin=require('../middleware/requireLogin')
-const nodemailer=require('nodemailer')
-const sendgridTransport=require('nodemailer-sendgrid-transport')
+// const nodemailer=require('nodemailer')
+// const sendgridTransport=require('nodemailer-sendgrid-transport')
+const sgMail=require('@sendgrid/mail')
 
-const transporter=nodemailer.createTransport(sendgridTransport({
-	auth:{
-		api_key:"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"
-	}
-}))
 
 
 router.get('/protected',requireLogin,(req,res)=>{
@@ -46,12 +42,13 @@ router.post('/signup',(req,res)=>{
 
  		user.save()
  		.then(user=>{
- 			transporter.sendMail({
- 				to:user.email,
- 				from:"yadavhitesh160@gmail.com",
- 				subject:"Signup success",
- 				html:"<h1>Welcome to Our Application</h1>"
- 			})
+ 			// transporter.sendMail({
+ 			// 	to:user.email,
+ 			// 	from:"yadavhitesh160@gmail.com",
+ 			// 	subject:"Signup success",
+ 			// 	html:"<h1>Welcome to Our Application</h1>"
+ 			// })
+
  			res.json({message:"SignedUp successfully"})
  		})
  		.catch(err=>{
@@ -106,18 +103,18 @@ router.post('/reset-password',(req,res)=>{
          User.findOne({email:req.body.email})
          .then(user=>{
              if(!user){
-                 return res.status(422).json({error:"User dont exists with that email"})
+                 return res.status(422).json({error:"User don't exists with that email"})
              }
              user.resetToken = token
              user.expireToken = Date.now() + 3600000
              user.save().then((result)=>{
-                 transporter.sendMail({
+                 sgMail.send({
                      to:user.email,
                      from:"yadavhitesh160@gmail.com",
                      subject:"password reset",
                      html:`
                      <p>You requested for password reset</p>
-                     <h5>click in this <a href="http://localhost:3000/reset${token}">link</a> to reset password</h5>
+                     <h5>click in this <a href="http://localhost:3000/reset/${token}">link</a> to reset password</h5>
                      `
                  })
                  res.json({message:"check your email"})
